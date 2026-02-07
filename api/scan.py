@@ -7,20 +7,24 @@ Query params:
 """
 
 import json
+import traceback
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import sys
 from pathlib import Path
+
+# Ensure we can import scanner.py from the same directory
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from scanner import run_scan
 
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        query = parse_qs(urlparse(self.path).query)
-        days = min(int(query.get("days", ["7"])[0]), 90)
-
         try:
+            from scanner import run_scan
+
+            query = parse_qs(urlparse(self.path).query)
+            days = min(int(query.get("days", ["7"])[0]), 90)
+
             result = run_scan(days=days)
             body = json.dumps(result, ensure_ascii=False)
             self.send_response(200)
@@ -30,7 +34,12 @@ class handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body.encode("utf-8"))
         except Exception as e:
+            error_detail = traceback.format_exc()
             self.send_response(500)
             self.send_header("Content-Type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
-            self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+            self.wfile.write(json.dumps({
+                "error": str(e),
+                "trace": error_detail
+            }).encode("utf-8"))

@@ -13,6 +13,9 @@ import requests
 from bs4 import BeautifulSoup
 import feedparser
 
+# Timeout for all HTTP requests (seconds) — important for serverless
+HTTP_TIMEOUT = 8
+
 
 # ============================================================
 # SIRA Framework Classification
@@ -253,8 +256,9 @@ def scan_rss_feeds(days: int = 7) -> list:
     )
     for source_name, feed_url in feeds.items():
         try:
-            feed = feedparser.parse(feed_url)
-            for entry in feed.entries[:30]:
+            resp = requests.get(feed_url, headers=HEADERS, timeout=HTTP_TIMEOUT)
+            feed = feedparser.parse(resp.content)
+            for entry in feed.entries[:15]:
                 title = entry.get("title", "")
                 summary = entry.get("summary", entry.get("description", ""))
                 summary = BeautifulSoup(summary, "html.parser").get_text()[:500]
@@ -287,7 +291,7 @@ def scan_ai_incident_database() -> list:
     events = []
     try:
         url = "https://incidentdatabase.ai/api/incidents?limit=20"
-        resp = requests.get(url, headers=HEADERS, timeout=15)
+        resp = requests.get(url, headers=HEADERS, timeout=HTTP_TIMEOUT)
         if resp.status_code == 200:
             data = resp.json()
             for incident in data.get("incidents", []):
@@ -323,7 +327,8 @@ def scan_google_news(days: int = 7) -> list:
     for query in queries:
         try:
             rss_url = f"https://news.google.com/rss/search?q={quote_plus(query)}&hl=en&gl=US&ceid=US:en"
-            feed = feedparser.parse(rss_url)
+            resp = requests.get(rss_url, headers=HEADERS, timeout=HTTP_TIMEOUT)
+            feed = feedparser.parse(resp.content)
             for entry in feed.entries[:10]:
                 title = entry.get("title", "")
                 summary = entry.get("summary", entry.get("description", ""))
