@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/api/scan", "destination": "/api/scan" }
-  ],
-  "functions": {
-    "api/scan.py": {
-      "maxDuration": 60
-    }
-  }
+  "buildCommand": "",
+  "outputDirectory": "public"
 }

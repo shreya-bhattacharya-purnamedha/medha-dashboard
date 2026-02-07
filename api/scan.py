@@ -13,14 +13,14 @@ from urllib.parse import urlparse, parse_qs
 import sys
 from pathlib import Path
 
-# Ensure we can import scanner.py from the same directory
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Add project root to path so we can import lib_scanner
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
-            from scanner import run_scan
+            from lib_scanner import run_scan
 
             query = parse_qs(urlparse(self.path).query)
             days = min(int(query.get("days", ["7"])[0]), 90)
