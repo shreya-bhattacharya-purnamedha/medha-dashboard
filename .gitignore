@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Vercel
+.vercel/
+
+# Node (if any)
+node_modules/
+
+# OS
+.DS_Store
+
+# Generated scan outputs
+scans/
+
+# Claude Code local settings
+.claude/
+
+# Environment
+.env
+.env.local
