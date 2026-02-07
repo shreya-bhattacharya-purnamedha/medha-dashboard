@@ -1,13 +1,11 @@
 {
   "version": 2,
-  "routes": [
-    { "src": "/api/scan", "dest": "/api/scan.py" },
-    { "src": "/(.*)", "dest": "/public/$1" }
+  "rewrites": [
+    { "source": "/api/scan", "destination": "/api/scan" }
   ],
   "functions": {
     "api/scan.py": {
-      "maxDuration": 60,
-      "runtime": "@vercel/python@4.5.0"
+      "maxDuration": 60
     }
   }
 }
